@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BridgeDoc — Trilingual Document Translator</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon"></span>
+        <span class="logo-text">BridgeDoc</span>
+      </div>
+      <div class="header-meta">
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Trilingual Document Translation</h1>
+    <p>Translate PDF, DOCX, CSV and TSV files across<br/>
+       <strong>English · Nepali · Tamang</strong><br/>
+       with full layout preservation.</p>
+    <div class="lang-badges">
+      <span class="badge">English ↔ Nepali</span>
+      <span class="badge">English ↔ Tamang</span>
+      <span class="badge">Nepali ↔ Tamang</span>
+    </div>
+  </section>
+
+  <!-- MAIN APP -->
+  <main class="app-container">
+
+    <!-- LEFT PANEL -->
+    <section class="panel panel-left">
+      <h2 class="panel-title">⚙️ Configuration</h2>
+
+      <div class="form-group">
+        <label for="api-key">TMT API Key</label>
+        <div class="input-wrapper">
+          <input
+            type="password"
+            id="api-key"
+            placeholder="Enter your API key..."
+            autocomplete="off"
+          />
+          <button class="toggle-password" onclick="togglePassword()">👁</button>
+        </div>
+        <span class="hint">Provided upon hackathon registration</span>
+      </div>
+
+      <div class="form-group">
+        <label for="direction">Translation Direction</label>
+        <select id="direction">
+          <option value="en→ne">English → Nepali</option>
+          <option value="en→tamang">English → Tamang</option>
+          <option value="ne→en">Nepali → English</option>
+          <option value="ne→tamang">Nepali → Tamang</option>
+          <option value="tamang→en">Tamang → English</option>
+          <option value="tamang→ne">Tamang → Nepali</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Upload Document</label>
+        <div class="dropzone" id="dropzone">
+          <div class="dropzone-inner" id="dropzone-inner">
+            <span class="dropzone-icon">📂</span>
+            <p>Drop file here or <span class="link">browse</span></p>
+            <p class="hint">PDF · DOCX · CSV · TSV · Max 1MB</p>
+          </div>
+          <input
+            type="file"
+            id="file-input"
+            accept=".pdf,.docx,.csv,.tsv"
+            hidden
+          />
+        </div>
+
+        <!-- File info card -->
+        <div class="file-info" id="file-info" style="display:none;">
+          <div class="file-info-row">
+            <span class="file-icon" id="file-icon">📄</span>
+            <div class="file-details">
+              <span class="file-name" id="file-name"></span>
+              <span class="file-meta" id="file-meta"></span>
+            </div>
+            <button class="remove-file" onclick="removeFile()">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="translate-btn" onclick="startTranslation()">
+        <span id="btn-text">▶ Translate Document</span>
+        <span id="btn-spinner" class="spinner" style="display:none;"></span>
+      </button>
+
+      <!-- Quality Check Toggle -->
+      <div class="toggle-row">
+        <label class="toggle-label" for="quality-check">
+          Enable Quality Verification
+          <span class="tooltip" title="Back-translates output to score accuracy">ℹ️</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="quality-check" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+    </section>
+
+    <!-- RIGHT PANEL -->
+    <section class="panel panel-right">
+      <h2 class="panel-title">📥 Output</h2>
+
+      <!-- Idle state -->
+      <div class="idle-state" id="idle-state">
+        <span class="idle-icon">🌐</span>
+        <p>Upload a document and click Translate</p>
+      </div>
+
+      <!-- Progress state -->
+      <div class="progress-state" id="progress-state" style="display:none;">
+        <div class="progress-steps">
+          <div class="step" id="step-parse">
+            <span class="step-icon">📖</span>
+            <span class="step-label">Parsing</span>
+            <span class="step-status" id="status-parse">⏳</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step" id="step-segment">
+            <span class="step-icon">✂️</span>
+            <span class="step-label">Segmenting</span>
+            <span class="step-status" id="status-segment">⏳</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step" id="step-translate">
+            <span class="step-icon">🔄</span>
+            <span class="step-label">Translating</span>
+            <span class="step-status" id="status-translate">⏳</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step" id="step-rebuild">
+            <span class="step-icon">🔧</span>
+            <span class="step-label">Rebuilding</span>
+            <span class="step-status" id="status-rebuild">⏳</span>
+          </div>
+        </div>
+
+        <div class="progress-bar-wrapper">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <p class="progress-label" id="progress-label">Initializing...</p>
+        <p class="progress-count" id="progress-count"></p>
+      </div>
+
+      <!-- Result state -->
+      <div class="result-state" id="result-state" style="display:none;">
+
+        <div class="result-stats" id="result-stats"></div>
+
+        <!-- Quality Report -->
+        <div class="quality-report" id="quality-report" style="display:none;">
+          <h3>🔬 Quality Report</h3>
+          <div class="quality-score-bar">
+            <span class="quality-label">Average Score</span>
+            <div class="quality-bar-wrap">
+              <div class="quality-bar" id="quality-bar"></div>
+            </div>
+            <span class="quality-pct" id="quality-pct"></span>
+          </div>
+          <div class="quality-flags" id="quality-flags"></div>
+        </div>
+
+        <button class="btn-download" id="download-btn">
+          📥 Download Translated File
+        </button>
+
+        <button class="btn-secondary" onclick="resetApp()">
+          🔄 Translate Another
+        </button>
+      </div>
+
+      <!-- Error state -->
+      <div class="error-state" id="error-state" style="display:none;">
+        <span class="error-icon">⚠️</span>
+        <p class="error-message" id="error-message"></p>
+        <button class="btn-secondary" onclick="resetApp()">Try Again</button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- STATS BAR -->
+  <section class="stats-bar">
+    <div class="stat">
+      <span class="stat-num" id="stat-files">0</span>
+      <span class="stat-label">Files Translated</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="stat-sentences">0</span>
+      <span class="stat-label">Sentences Processed</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="stat-formats">4</span>
+      <span class="stat-label">Formats Supported</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="stat-directions">6</span>
+      <span class="stat-label">Translation Directions</span>
+    </div>
+  </section>
+
+  <!-- INFO SECTION -->
+  <section class="info-section">
+    <div class="info-grid">
+      <div class="info-card">
+        <span class="info-icon">📄</span>
+        <h3>PDF</h3>
+        <p>Full layout preservation. Fonts, columns, spacing maintained. Scanned PDFs detected and reported.</p>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">📝</span>
+        <h3>DOCX</h3>
+        <p>Headers, footers, tables, footnotes and text boxes all translated with formatting intact.</p>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">📊</span>
+        <h3>CSV / TSV</h3>
+        <p>Smart column detection skips dates, numbers and codes. Only translates actual text content.</p>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">🔬</span>
+        <h3>Quality Check</h3>
+        <p>Optional back-translation verification scores each sentence and flags low-confidence outputs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>Team: Exponent</p>
+    <p></p>
+    <p class="footer-license"></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
