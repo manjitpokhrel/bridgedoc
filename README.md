@@ -1,3 +1,27 @@
+## ⚡ Quick Start
+
+### 1. Clone
+git clone https://github.com/manjitpokhrel/bridgedoc.git
+cd bridgedoc
+
+### 2. Install
+pip install -r backend/requirements.txt
+
+### 3. Run
+cd backend
+uvicorn main:app --port 8000
+
+### 4. Open
+Open index.html in your browser
+
+### 5. Use
+- Enter your TMT API key
+- Select translation direction
+- Upload your file (PDF, DOCX, CSV, TSV)
+- Click Translate
+- Download result
+
+
 # 🌉 BridgeDoc
 ### Trilingual Document Translation System  
 **Google TMT Hackathon 2026 — Track 2**  
