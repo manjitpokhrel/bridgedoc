@@ -55,7 +55,7 @@ BridgeDoc solves this with:
 ---
 
 ## 🎬 Demo
-▶️ https://youtu.be/c6ZtF9N6LM0
+▶️ https://www.youtube.com/watch?v=jDM91IAJLR4
 
 ---
 
